@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const planetsRouter = require("./routes/planetsRouter.js");
 
 app.use(express.json());
+
 app.use(morgan("dev"));
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();

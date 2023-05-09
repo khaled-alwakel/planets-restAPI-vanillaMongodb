@@ -6,11 +6,11 @@ const client = new MongoClient(uri);
 
 exports.checkID = async (req, res, next, value) => {
   console.log(`planet id is : ${value}`);
-  const cursor = client
+  const result = client
     .db("sample_guides")
     .collection("planets")
-    .find({ _id: value });
-  const result = await cursor.toArray();
+    .findOne({ _id: value });
+
   if (result)
     return res.status(404).json({
       status: "fail",
@@ -113,7 +113,7 @@ exports.updatePlanet = async (req, res) => {
     const query = { _id: ObjectId(req.params.id) };
     const updates = req.body;
     await client.connect();
-    const planet = client
+    const updatedPlanet = client
       .db("sample_guides")
       .collection("planets")
       .updateOne({ query }, { $set: updates });
@@ -121,7 +121,7 @@ exports.updatePlanet = async (req, res) => {
     res.status(200).json({
       requestedAt: req.requestTime,
       status: `success,  Planet updated`,
-      data: { planet },
+      data: { updatedPlanet },
     });
   } catch (error) {
     res.status(400).json({
@@ -138,7 +138,7 @@ exports.deletePlanet = async (req, res) => {
     const query = { _id: ObjectId(req.params.id) };
 
     await client.connect();
-    const planet = client
+    const deletedPlanet = client
       .db("sample_guides")
       .collection("planets")
       .deleteOne({ query });
@@ -146,7 +146,7 @@ exports.deletePlanet = async (req, res) => {
     res.status(200).json({
       requestedAt: req.requestTime,
       status: `success,  Planet deleted`,
-      data: { planet },
+      data: { deletedPlanet },
     });
   } catch (error) {
     res.status(400).json({
