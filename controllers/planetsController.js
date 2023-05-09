@@ -4,15 +4,18 @@ let uri =
 const { MongoClient } = require("mongodb");
 const client = new MongoClient(uri);
 
-exports.checkID = (req, res, next, value) => {
+exports.checkID = async (req, res, next, value) => {
   console.log(`planet id is : ${value}`);
-  //todo check if id exist or no
-  // if () {
-  //   return res.status(404).json({
-  //     status: "fail",
-  //     message: "Invalid Id ",
-  //   });
-  // }
+  const cursor = client
+    .db("sample_guides")
+    .collection("planets")
+    .find({ _id: value });
+  const result = await cursor.toArray();
+  if (result)
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid Id ",
+    });
   next();
 };
 
