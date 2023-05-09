@@ -19,10 +19,11 @@
     "jake": "^10.8.5",
     "minimatch": "^3.1.2",
     "mongodb": "^5.4.0",
+    "morgan": "^1.10.0",
     "supports-color": "^7.2.0"
   },
   "scripts": {
-      "start:dev": "nodemon server.js"
+    "start:dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",

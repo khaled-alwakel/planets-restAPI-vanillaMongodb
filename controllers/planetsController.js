@@ -58,18 +58,102 @@ exports.getAllPlanets = async (req, res) => {
   }
 };
 
-exports.getPlanet = (req, res) => {
-  //TODO
+exports.getPlanet = async (req, res) => {
+  try {
+    let query = { _id: ObjectId(req.params.id) };
+    await client.connect();
+    const planet = client
+      .db("sample_guides")
+      .collection("planets")
+      .findOne(query);
+
+    if (planet) {
+      res.status(200).json({
+        requestedAt: req.requestTime,
+        status: "success",
+        data: { planet },
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      message: error,
+    });
+  } finally {
+    await client.close();
+  }
 };
 
-exports.createPlanet = (req, res) => {
-  //TODO
+exports.createPlanet = async (req, res) => {
+  try {
+    const newPlanet = req.body;
+    await client.connect();
+    const planet = client
+      .db("sample_guides")
+      .collection("planets")
+      .insertOne(newPlanet);
+
+    res.status(200).json({
+      requestedAt: req.requestTime,
+      status: `success Planet created with the following id: ${result.insertedId}`,
+      data: { planet },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      message: error,
+    });
+  } finally {
+    await client.close();
+  }
 };
 
-exports.updatePlanet = (req, res) => {
-  //TODO
+exports.updatePlanet = async (req, res) => {
+  try {
+    const query = { _id: ObjectId(req.params.id) };
+    const updates = req.body;
+    await client.connect();
+    const planet = client
+      .db("sample_guides")
+      .collection("planets")
+      .updateOne({ query }, { $set: updates });
+
+    res.status(200).json({
+      requestedAt: req.requestTime,
+      status: `success,  Planet updated`,
+      data: { planet },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      message: error,
+    });
+  } finally {
+    await client.close();
+  }
 };
 
-exports.deletePlanet = (req, res) => {
-  //TODO
+exports.deletePlanet = async (req, res) => {
+  try {
+    const query = { _id: ObjectId(req.params.id) };
+
+    await client.connect();
+    const planet = client
+      .db("sample_guides")
+      .collection("planets")
+      .deleteOne({ query });
+
+    res.status(200).json({
+      requestedAt: req.requestTime,
+      status: `success,  Planet deleted`,
+      data: { planet },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      message: error,
+    });
+  } finally {
+    await client.close();
+  }
 };
