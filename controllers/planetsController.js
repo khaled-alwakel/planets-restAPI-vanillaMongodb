@@ -46,10 +46,6 @@ exports.getAllPlanets = async (req, res) => {
       data: { planets },
     });
   } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: "error : can't find planets",
-    });
     console.log(error);
   }
 };
@@ -94,10 +90,6 @@ exports.createPlanet = async (req, res) => {
       data: { planet },
     });
   } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: "error",
-    });
     console.log(error);
   }
 };
