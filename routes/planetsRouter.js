@@ -1,20 +1,20 @@
 const express = require("express");
-const tasksController = require("../controllers/tasksController");
+const planetsController = require("../controllers/planetsController");
 const router = express.Router();
 
 //* param middleware
 // here we specify first the parameter that we actually want to search for, so basically the parameter for which this middleware is gonna run
-router.param("id", tasksController.checkID);
+router.param("id", planetsController.checkID);
 
 router
   .route("/")
-  .get(tasksController.getAllTasks)
-  .post(tasksController.checkBody, tasksController.createTask); // check body before create product
+  .get(planetsController.getAllPlanets)
+  .post(planetsController.checkBody, planetsController.createPlanet); // check body before create product
 
 router
   .route("/:id")
-  .get(tasksController.getTask)
-  .patch(tasksController.updateTask)
-  .delete(tasksController.deleteTask);
+  .get(planetsController.getPlanet)
+  .patch(planetsController.updatePlanet)
+  .delete(planetsController.deletePlanet);
 
 module.exports = router;
