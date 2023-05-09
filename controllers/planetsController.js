@@ -1,147 +1,137 @@
-let uri =
-  "mongodb+srv://Khaled-Alwakel:rTZfq8uZiiJmQw0e@cluster0.g1hid9r.mongodb.net/sample_guides?retryWrites=true&w=majority";
+const { MongoClient, ObjectId } = require("mongodb");
+const uri =
+  "mongodb+srv://Khaled-Alwakel:rTZfq8uZiiJmQw0e@cluster0.g1hid9r.mongodb.net/?retryWrites=true&w=majority";
 
-const { MongoClient } = require("mongodb");
 const client = new MongoClient(uri);
+const dbName = "sample_guides";
 
 exports.checkID = async (req, res, next, value) => {
-  console.log(`planet id is : ${value}`);
-  const result = client
-    .db("sample_guides")
-    .collection("planets")
-    .findOne({ _id: value });
-
-  if (result)
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid Id ",
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+    const result = await collection.findOne({
+      _id: new ObjectId(value),
     });
-  next();
-};
-
-// middleware for check the request body
-exports.checkBody = (req, res, next) => {
-  if (!req.body.Name || !req.body.orderFromSun) {
-    return res.status(400).json({
-      status: "fail",
-      message: "missing name or order from sun!",
+    if (result) next();
+  } catch (error) {
+    res.status(400).json({
+      status: "failed",
+      message: "invalid id",
     });
   }
-  next(); // next is create planet
 };
-
+exports.checkBody = async (req, res, next) => {
+  if (!req.body.name)
+    return res.status(400).json({
+      status: "failed",
+      message: "missing name or orderFromSun",
+    });
+  else {
+    next();
+  }
+};
 // get all planet according to order from sun :)
 exports.getAllPlanets = async (req, res) => {
   try {
     await client.connect();
-    const cursor = client
-      .db("sample_guides")
-      .collection("planets")
-      .find({})
-      .sort({ orderFromSun: 1 });
-    const planets = await cursor.toArray();
-    if (planets) {
-      res.status(200).json({
-        requestedAt: req.requestTime,
-        status: "success",
-        results: planets.length,
-        data: { planets },
-      });
-    }
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+    const planets = await collection.find().toArray();
+
+    res.status(200).json({
+      requestedAt: req.requestTime,
+      status: "success",
+      results: planets.length,
+      data: { planets },
+    });
   } catch (error) {
     res.status(400).json({
       status: "failed",
-      message: error,
+      message: "error : can't find planets",
     });
-  } finally {
-    await client.close();
+    console.log(error);
   }
 };
 
 exports.getPlanet = async (req, res) => {
   try {
-    let query = { _id: ObjectId(req.params.id) };
     await client.connect();
-    const planet = client
-      .db("sample_guides")
-      .collection("planets")
-      .findOne(query);
-
-    if (planet) {
-      res.status(200).json({
-        requestedAt: req.requestTime,
-        status: "success",
-        data: { planet },
-      });
-    }
-  } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: error,
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+    const planet = await collection.findOne({
+      _id: new ObjectId(req.params.id),
     });
-  } finally {
-    await client.close();
+
+    res.status(200).json({
+      requestedAt: req.requestTime,
+      status: "success",
+      data: { planet },
+    });
+  } catch (error) {
+    console.log(error);
   }
 };
 
 exports.createPlanet = async (req, res) => {
   try {
-    const newPlanet = req.body;
     await client.connect();
-    const planet = client
-      .db("sample_guides")
-      .collection("planets")
-      .insertOne(newPlanet);
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+    const newPlanet = req.body;
+    const result = await collection.findOne(newPlanet);
+    if (result) {
+      res.status(400).json({
+        status: "failed",
+        message: "already existed",
+      });
+    }
+    const planet = await collection.insertOne(newPlanet);
 
     res.status(200).json({
       requestedAt: req.requestTime,
-      status: `success Planet created with the following id: ${result.insertedId}`,
+      status: `success Planet created with the following id: ${planet.insertedId}`,
       data: { planet },
     });
   } catch (error) {
     res.status(400).json({
       status: "failed",
-      message: error,
+      message: "error",
     });
-  } finally {
-    await client.close();
+    console.log(error);
   }
 };
 
 exports.updatePlanet = async (req, res) => {
   try {
-    const query = { _id: ObjectId(req.params.id) };
     const updates = req.body;
     await client.connect();
-    const updatedPlanet = client
-      .db("sample_guides")
-      .collection("planets")
-      .updateOne({ query }, { $set: updates });
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+
+    const updatedPlanets = await collection.updateMany(
+      { _id: new ObjectId(req.params.id) },
+      { $set: updates }
+    );
 
     res.status(200).json({
       requestedAt: req.requestTime,
-      status: `success,  Planet updated`,
-      data: { updatedPlanet },
+      status: `success,  Planet(s) updated`,
+      data: { updatedPlanets },
     });
   } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: error,
-    });
-  } finally {
-    await client.close();
+    console.log(error);
   }
 };
 
 exports.deletePlanet = async (req, res) => {
   try {
-    const query = { _id: ObjectId(req.params.id) };
-
     await client.connect();
-    const deletedPlanet = client
-      .db("sample_guides")
-      .collection("planets")
-      .deleteOne({ query });
+    const db = client.db(dbName);
+    const collection = db.collection("planets");
+    const deletedPlanet = await collection.deleteOne({
+      _id: new ObjectId(req.params.id),
+    });
 
     res.status(200).json({
       requestedAt: req.requestTime,
@@ -149,11 +139,6 @@ exports.deletePlanet = async (req, res) => {
       data: { deletedPlanet },
     });
   } catch (error) {
-    res.status(400).json({
-      status: "failed",
-      message: error,
-    });
-  } finally {
-    await client.close();
+    console.log(error);
   }
 };
