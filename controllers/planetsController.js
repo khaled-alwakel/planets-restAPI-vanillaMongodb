@@ -109,7 +109,7 @@ exports.updatePlanet = async (req, res) => {
     const db = client.db(dbName);
     const collection = db.collection("planets");
 
-    const updatedPlanets = await collection.updateMany(
+    const updatedPlanets = await collection.updateOne(
       { _id: new ObjectId(req.params.id) },
       { $set: updates }
     );
