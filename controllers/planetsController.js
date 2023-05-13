@@ -1,8 +1,7 @@
 const { MongoClient, ObjectId } = require("mongodb");
-const uri =
-  "mongodb+srv://Khaled-Alwakel:rTZfq8uZiiJmQw0e@cluster0.g1hid9r.mongodb.net/?retryWrites=true&w=majority";
 
-const client = new MongoClient(uri);
+const client = new MongoClient("mongodb://localhost:27017/planets");
+
 const dbName = "sample_guides";
 
 exports.checkID = async (req, res, next, value) => {
