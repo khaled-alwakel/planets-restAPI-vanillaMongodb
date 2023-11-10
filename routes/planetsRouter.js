@@ -9,7 +9,7 @@ router.param("id", planetsController.checkID);
 router
   .route("/")
   .get(planetsController.getAllPlanets)
-  .post(planetsController.checkBody, planetsController.createPlanet); // check body before create product
+  .post(planetsController.createPlanet); // check body before create product
 
 router
   .route("/:id")

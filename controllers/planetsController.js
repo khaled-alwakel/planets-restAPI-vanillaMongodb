@@ -2,13 +2,13 @@ const { MongoClient, ObjectId } = require("mongodb");
 
 const client = new MongoClient("mongodb://localhost:27017/planets");
 
-const dbName = "sample_guides";
+const dbName = "planets";
+const db = client.db(dbName);
+const collection = db.collection("planets");
 
 exports.checkID = async (req, res, next, value) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection("planets");
     const result = await collection.findOne({
       _id: new ObjectId(value),
     });
@@ -20,24 +20,21 @@ exports.checkID = async (req, res, next, value) => {
     });
   }
 };
-exports.checkBody = async (req, res, next) => {
-  if (!req.body.name)
-    return res.status(400).json({
-      status: "failed",
-      message: "missing name or orderFromSun",
-    });
-  else {
-    next();
-  }
-};
+// exports.checkBody = async (req, res, next) => {
+//   if (!req.body.planetName || !req.body.orderFromSun) {
+//     return res.status(400).json({
+//       status: "failed",
+//       message: "missing planetName or orderFromSun",
+//     });
+//   } else {
+//     next();
+//   }
+// };
 // get all planet according to order from sun :)
 exports.getAllPlanets = async (req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection("planets");
     const planets = await collection.find().toArray();
-
     res.status(200).json({
       requestedAt: req.requestTime,
       status: "success",
@@ -52,8 +49,7 @@ exports.getAllPlanets = async (req, res) => {
 exports.getPlanet = async (req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection("planets");
+
     const planet = await collection.findOne({
       _id: new ObjectId(req.params.id),
     });
@@ -71,8 +67,7 @@ exports.getPlanet = async (req, res) => {
 exports.createPlanet = async (req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection("planets");
+
     const newPlanet = req.body;
     const result = await collection.findOne(newPlanet);
     if (result) {
@@ -96,8 +91,7 @@ exports.createPlanet = async (req, res) => {
 exports.updatePlanet = async (req, res) => {
   try {
     const updates = req.body;
-    await client.connect();
-    const db = client.db(dbName);
+
     const collection = db.collection("planets");
 
     const updatedPlanets = await collection.updateOne(
@@ -118,8 +112,7 @@ exports.updatePlanet = async (req, res) => {
 exports.deletePlanet = async (req, res) => {
   try {
     await client.connect();
-    const db = client.db(dbName);
-    const collection = db.collection("planets");
+
     const deletedPlanet = await collection.deleteOne({
       _id: new ObjectId(req.params.id),
     });

@@ -13,7 +13,7 @@ app.use((req, res, next) => {
 
 app.use("/api/v1/planets", planetsRouter);
 
-const port = 3000;
+const port = 5000;
 app.listen(port, () => {
   console.log(`server is running on port ${port}....`);
 });
