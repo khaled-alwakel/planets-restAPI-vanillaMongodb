@@ -20,7 +20,7 @@
     "minimatch": "^3.1.2",
     "mongodb": "^5.4.0",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.2",
     "supports-color": "^7.2.0"
   },
   "scripts": {

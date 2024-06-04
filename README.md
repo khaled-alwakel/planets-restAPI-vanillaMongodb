@@ -16,7 +16,7 @@ DELETE "api/v1/planets/:id" # delete planet
 npm install
 ```
 
-## to start server In Development
+## To Start Server In Development
 
 ```bash
 npm run start:dev
